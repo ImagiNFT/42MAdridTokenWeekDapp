@@ -93,7 +93,7 @@ const utils = {
         try {
             const { address, abi, network: factNet } = NFTFactory
             const detectedProvider = await detectEthereumProvider();
-            alert(JSON.stringify(detectedProvider))
+
 
             if (detectedProvider) {
                 await this.requestAccount()
@@ -111,6 +111,7 @@ const utils = {
                     contract = this.connectSmartContract({ abi, address, signer })
                     return { contract, account, provider, network, signer }
                 } else {
+                    alert('Please switch to the correct network')
                     throw new Error('Please switch to the correct network')
                 }
             } else {
