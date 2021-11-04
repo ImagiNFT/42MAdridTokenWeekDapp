@@ -91,7 +91,7 @@ const utils = {
             const { address, abi, network: factNet } = NFTFactory
 
 
-            if (typeof (window.ethereum) !== 'undefined') {
+            //if (typeof (window.ethereum) !== 'undefined') {
                 let rquest = await this.requestAccount()
                 console.log({ rquest })
                 const provider = this.getProvider()
@@ -110,10 +110,10 @@ const utils = {
                 } else {
                     throw new Error('Please switch to the correct network')
                 }
-            } else {
-                alert('Please install MetaMask.')
-                throw new Error('Please install MetaMask')
-            }
+           // } else {
+          //      alert('Please install MetaMask.')
+           //     throw new Error('Please install MetaMask')
+        //    }
         } catch (error) {
             console.error("UTILS:WEB3:CONNECT:", error)
         }
