@@ -64,7 +64,7 @@ const utils = {
         return contract
     },
 
-    switchNetwork: async function ({  network }) {
+    switchNetwork: async function ({ network }) {
         try {
             await window.ethereum.request({
                 method: "wallet_switchEthereumChain",
@@ -91,8 +91,9 @@ const utils = {
             const { address, abi, network: factNet } = NFTFactory
 
 
-            if (typeof window.ethereum !== 'undefined') {
-                await this.requestAccount()
+            if (typeof (window.ethereum) !== 'undefined') {
+                let rquest = await this.requestAccount()
+                console.log({ rquest })
                 const provider = this.getProvider()
                 const signer = await this.getSigner({ provider })
                 const account = await this.getAccount({ provider })
@@ -103,7 +104,7 @@ const utils = {
                     console.log('UTILS:WEB3:CONNECT:SWITCH_TO', networks[factNet.chainId])
                     await this.switchNetwork({ network: networks[factNet.chainId] })
                 }
-                if (network?.chainId === factNet?.chainId){
+                if (network?.chainId === factNet?.chainId) {
                     contract = this.connectSmartContract({ abi, address, signer })
                     return { contract, account, provider, network, signer }
                 } else {
