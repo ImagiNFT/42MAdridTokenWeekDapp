@@ -93,7 +93,7 @@ const utils = {
         try {
             const { address, abi, network: factNet } = NFTFactory
             const detectedProvider = await detectEthereumProvider();
-
+            alert(JSON.stringify(detectedProvider))
 
             if (detectedProvider) {
                 await this.requestAccount()
