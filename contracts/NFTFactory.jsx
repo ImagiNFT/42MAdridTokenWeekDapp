@@ -1,8 +1,8 @@
 const config = {
   address: '0x415C8EbF910264bb06937C2CA2B9C484209669d6',
   network: {
-    chainId: 80001,
-    name: 'mumbai'
+    chainId: 137,
+    name: 'polygon'
   },
   abi: [
     {
@@ -38,7 +38,7 @@ const config = {
       "type": "function"
     },
 
-    
+
     {
       "anonymous": false,
       "inputs": [
