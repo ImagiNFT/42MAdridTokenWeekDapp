@@ -159,7 +159,8 @@ export const Web3Provider = ({ children }) => {
                 let customUri = uri.replace('{id}', ethers.BigNumber.from(i).toHexString().replace('0x', '').padStart(64, '0'))
                 let res = await fetch(customUri)
                 let meta = await res.json()
-                nfts.push({ meta, id })
+                let balance = await NFTFactory.balanceOf(account, id)
+                nfts.push({ meta, id, balance: balance.toNumber() })
             }
             return nfts
         } catch (error) {

@@ -15,8 +15,8 @@ const networks = {
 
     },
     80001: {
-        chainId: "0x13881",
         chainName: "Mumbai",
+        chainId: "0x13881",
         rpcUrls: ["https://rpc-mumbai.matic.today"],
         nativeCurrency: {
             name: "Matic",

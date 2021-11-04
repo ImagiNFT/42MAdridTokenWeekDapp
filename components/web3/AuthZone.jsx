@@ -1,10 +1,16 @@
 import { ethers } from 'ethers';
 import { useContext, useEffect, useState } from 'react';
 import { Web3Context } from '../../context/Web3Context';
+import Link from 'next/link'
 
 
 
 const AuthZone = () => {
+    const [showModal, setShowModal] = useState({
+        show: false,
+        nft: null
+    });
+
     const {
         account,
         connect,
@@ -16,9 +22,19 @@ const AuthZone = () => {
         await connect()
     }
 
+    const handleModal = (nft) => {
+        setShowModal({
+            show: !showModal.show,
+            nft
+        })
+    }
+
     useEffect(() => {
         console.log('DEBUG:UC:NFTs', NFTs)
     }, [NFTs])
+
+
+
 
     return (
         <div className=" w-screen h-full flex flex-col">
@@ -44,10 +60,22 @@ const AuthZone = () => {
                                             </h1>
 
                                             <h1 className="text-center">
-                                                {`#${nft.id}`}
+                                                {`#${nft.id.replace('0x', '')}`}
                                             </h1>
+
+
                                         </div>
-                                        <p className="text-center text-sm font-light">{nft.description}</p>
+                                        <p className="text-center text-sm font-light">{nft.meta.description}</p>
+                                        {nft.balance > 0 &&
+
+                                            <button
+                                                onClick={(e) => { e.preventDefault(); handleModal(nft) }}
+                                                className="text-center text-sm border border-blue-600  rounded-lg p-1 mx-4 my-2 hover:text-white hover:bg-blue-600" >
+                                                {`You have ${nft.balance} NFTs, Show benefits as owner`}
+                                            </button>
+
+                                        }
+
                                     </div>
                                 )
                             })
@@ -56,7 +84,15 @@ const AuthZone = () => {
                     </div>
                 </div>
             }
-        </div>
+            {showModal.show &&
+                <div className="absolute h-full top-0 w-screen bg-blue-600 border flex flex-col items-center justify-center">
+                    <button
+                        className="absolute top-0 w-full border p-1"
+                        onClick={(e) => { e.preventDefault(); setShowModal(false) }}>close modal</button>
+                    <h1>{showModal.nft.id}</h1>
+                </div>
+            }
+        </div >
     )
 }
 
