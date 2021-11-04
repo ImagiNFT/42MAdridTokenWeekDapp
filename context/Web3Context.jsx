@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 import { createContext, useEffect, useState } from 'react'
+import detectEthereumProvider from '@metamask/detect-provider';
 
 import NFTFactory from '../contracts/NFTFactory.jsx';
 
@@ -36,8 +37,8 @@ const utils = {
         return await window.ethereum.request({ method: 'eth_requestAccounts' });
     },
 
-    getProvider: function () {
-        const provider = new ethers.providers.Web3Provider(window.ethereum)
+    getProvider: function ({ detectedProvider = false }) {
+        const provider = new ethers.providers.Web3Provider(detectedProvider ? detectedProvider : window.ethereum)
         console.log('UTILS:WEB3:PROVIDER', provider)
         return provider
     },
@@ -91,12 +92,12 @@ const utils = {
     connect: async function () {
         try {
             const { address, abi, network: factNet } = NFTFactory
+            const detectedProvider = await detectEthereumProvider();
 
 
-            if (typeof (window.ethereum) !== 'undefined') {
-                let rquest = await this.requestAccount()
-                console.log({ rquest })
-                const provider = this.getProvider()
+            if (detectedProvider) {
+                await this.requestAccount()
+                const provider = this.getProvider({ detectedProvider })
                 const signer = await this.getSigner({ provider })
                 const account = await this.getAccount({ provider })
                 const network = await this.getNetwork({ provider })
