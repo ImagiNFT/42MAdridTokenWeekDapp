@@ -1,6 +1,11 @@
-import AuthZone from '../components/web3/AuthZone'
 import MainLayout from '../layout/MainLayout'
 
+import dynamic from 'next/dynamic'
+
+const AuthZone = dynamic(
+  () => import('../components/web3/AuthZone'),
+  { ssr: false }
+)
 
 export default function Home() {
   return (

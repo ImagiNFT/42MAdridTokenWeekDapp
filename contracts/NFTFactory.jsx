@@ -38,7 +38,7 @@ const config = {
       "type": "function"
     },
 
-    
+
     {
       "anonymous": false,
       "inputs": [
