@@ -1,48 +1,11 @@
 import { ethers } from 'ethers';
 import { useContext, useEffect, useState } from 'react';
 import { Web3Context } from '../../context/Web3Context';
-import NFTFactory from '../../contracts/NFTFactory'
-
-let utils = {
-
-    requestAccount: async function () {
-        return await window.ethereum.request({ method: 'eth_requestAccounts' });
-    },
-
-    getProvider: function () {
-        const provider = new ethers.providers.Web3Provider(window.ethereum)
-        console.log('DEBUG:UC:PROVIDER', provider)
-        return provider
-    },
-
-    getSigner: async function ({ provider }) {
-        const signer = await provider.getSigner()
-        console.log('DEBUG:UC:SIGNER', signer)
-        return signer
-    },
-
-    getAccount: async function ({ provider }) {
-        const account = await await provider.getSigner().getAddress()
-        console.log('DEBUG:UC:ACCOUNT', account)
-        return account
-    },
-
-    getNetwork: async function ({ provider }) {
-        const network = await provider.getNetwork()
-        console.log('DEBUG:UC:NETWORK', network)
-        return network
-    },
-
-    connectSmartContract: function ({ abi, address, signer }) {
-        const contract = new ethers.Contract(address, abi, signer)
-        console.log('DEBUG:UC:CONTRACT', contract)
-        return contract
-    },
-}
 
 
 const AuthZone = () => {
     const {
+        isConnected,
         account,
         connect,
         NFTs
@@ -59,14 +22,21 @@ const AuthZone = () => {
 
     return (
         <div className=" w-screen h-full flex flex-col">
-            {
-                !account &&
-                <button className="p-6 m-6 rounded rounded-2xl border border-blue-600 " onClick={(e) => handleConnect(e)}>Connect</button>
-            }
-            {
-                account &&
+            
+            
                 <div className="flex flex-col items-center justify-center m-4">
-                    <h1>You are connected with account: {account.slice(0, 6) + '...' + account.slice(account.length - 4, account.length)}</h1>
+                    {
+                        !isConnected &&
+                        <button className=" w-full p-6 m-6 rounded rounded-2xl border border-blue-600 " onClick={(e) => handleConnect(e)}>Connect</button>
+                    }
+                    {
+                        isConnected && account &&
+                            <h1>You are connected with account: {account.slice(0, 6) + '...' + account.slice(account.length - 4, account.length)}</h1>
+                    }
+                    {
+                        isConnected && !account &&
+                            <h1>You are not connected</h1>
+                    }
                     <div className="border rounded-lg h-full w-full m-auto p-4 shadow">
                         {
                         NFTs && NFTs.length > 0 &&
@@ -100,7 +70,7 @@ const AuthZone = () => {
 
                     </div>
                 </div>
-            }
+            
         </div>
     )
 }
