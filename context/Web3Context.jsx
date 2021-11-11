@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import { createContext, useEffect, useState } from 'react'
 import detectEthereumProvider from '@metamask/detect-provider';
+import { toast } from 'react-toastify'
 
 import NFTFactory from '../contracts/NFTFactory.jsx';
 
@@ -69,21 +70,21 @@ const utils = {
 
     switchNetwork: async function ({ network }) {
         try {
-            await window.ethereum.request({
+            return await window.ethereum.request({
                 method: "wallet_switchEthereumChain",
                 params: [{ chainId: network.chainId }],
             });
         } catch (error) {
             if (error.code === 4902) {
                 try {
-                    await window.ethereum.request({
+                    return await window.ethereum.request({
                         method: "wallet_addEthereumChain",
                         params: [
                             network,
                         ],
                     });
                 } catch (error) {
-                    alert(error.message);
+                    toast.error(error.message);
                 }
             }
         }
@@ -93,32 +94,28 @@ const utils = {
         try {
             const { address, abi, network: factNet } = NFTFactory
             const detectedProvider = await detectEthereumProvider();
-
-
             if (detectedProvider) {
                 await this.requestAccount()
                 const provider = this.getProvider({ detectedProvider })
-                const signer = await this.getSigner({ provider })
-                const account = await this.getAccount({ provider })
                 const network = await this.getNetwork({ provider })
-                let contract;
                 if (network?.chainId !== factNet?.chainId) {
-                    alert('Please switch to the correct network')
-                    console.log('UTILS:WEB3:CONNECT:SWITCH_TO', networks[factNet.chainId])
-                    await this.switchNetwork({ network: networks[factNet.chainId] })
+                    toast.warning('Please switch to the correct network')
+                    let response = await this.switchNetwork({ network: networks[factNet.chainId] })
+                    console.log('UTILS:WEB3:SWITCHNETWORK:', response)
                 }
                 if (network?.chainId === factNet?.chainId) {
+                    const signer = await this.getSigner({ provider })
+                    const account = await this.getAccount({ provider })
+                    let contract;
                     contract = this.connectSmartContract({ abi, address, signer })
                     return { contract, account, provider, network, signer }
-                } else {
-                    alert('Please switch to the correct network')
-                    throw new Error('Please switch to the correct network')
                 }
             } else {
-                alert('Please install MetaMask.')
+                toast.error('Please install MetaMask.')
                 throw new Error('Please install MetaMask')
             }
         } catch (error) {
+            toast.error('Error connecting', error.message)
             console.error("UTILS:WEB3:CONNECT:", error)
         }
     }
@@ -138,17 +135,6 @@ export const Web3Provider = ({ children }) => {
 
     // NFTFactory UTILS
 
-
-    const fetchMetadata = async ({ uri }) => {
-        try {
-            let response = await fetch(uri)
-            let data = await response.json()
-            return data
-        } catch (error) {
-            console.error("ERR:WEB3CTX:FETCHMETADATA:", error)
-        }
-    }
-
     const getNFTs = async () => {
         try {
             let lastId = await NFTFactory.getNFT_ID()
@@ -164,6 +150,7 @@ export const Web3Provider = ({ children }) => {
             }
             return nfts
         } catch (error) {
+            toast.error('Error while fetching NFTs.')
             console.error("ERR:WEB3CTX:GETNFTS:", error)
         }
     }
@@ -182,6 +169,7 @@ export const Web3Provider = ({ children }) => {
                 setSigner(signer)
             }
         } catch (error) {
+            toast.error('Error while connecting.')
             console.error("ERR:WEB3CTX:CONNECT:", error)
         }
     }
@@ -190,7 +178,6 @@ export const Web3Provider = ({ children }) => {
         async function fetchNFTs() {
             if (NFTFactory && (!NFTs || NFTs.length === 0)) {
                 let nfts = await getNFTs()
-                console.log("AQUI", { nfts })
                 setNFTs(nfts)
             }
         }
