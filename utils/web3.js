@@ -1,11 +1,11 @@
 import { ethers } from 'ethers';
 import NFTFactory from '../contracts/NFTFactory.jsx';
 
-const networks = {
+export const networks = {
     137: {
         chainName: "Polygon",
         chainId: "0x89",
-        rpcUrls: ["polygon-rpc.com"],
+        rpcUrls: ["https://polygon-rpc.com"],
         nativeCurrency: {
             name: "Matic",
             symbol: "Matic",
@@ -37,6 +37,12 @@ const utils = {
     getProvider: function () {
         const provider = new ethers.providers.Web3Provider(window.ethereum)
         console.log('UTILS:WEB3:PROVIDER', provider)
+        return provider
+    },
+
+    getProviderWithoutMetaMask: function ({url}) {
+        const provider = new ethers.providers.JsonRpcProvider(url);
+        console.log('DEBUG:UC:PROVIDERWITHOUTMETAMASK', provider)
         return provider
     },
 
@@ -112,7 +118,7 @@ const utils = {
                 }
             } else {
                 alert('Please install MetaMask.')
-                throw new Error('Please install MetaMask')
+                //throw new Error('Please install MetaMask')
             }
         } catch (error) {
             console.error("UTILS:WEB3:CONNECT:", error)

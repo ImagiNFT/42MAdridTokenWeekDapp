@@ -1,7 +1,9 @@
 import { ethers } from 'ethers';
 import { useContext, useEffect, useState } from 'react';
 import { Web3Context } from '../../context/Web3Context';
+
 import Link from 'next/link'
+
 
 
 
@@ -12,6 +14,7 @@ const AuthZone = () => {
     });
 
     const {
+        isConnected,
         account,
         connect,
         NFTs
@@ -38,21 +41,36 @@ const AuthZone = () => {
 
     return (
         <div className=" w-screen h-full flex flex-col">
-            {
-                !account &&
-                <button className="p-6 m-6 rounded rounded-2xl border border-blue-600 " onClick={(e) => handleConnect(e)}>Connect</button>
-            }
-            {
-                account &&
+            
+            
                 <div className="flex flex-col items-center justify-center m-4">
-                    <h1>Account: {account.slice(0, 6) + '...' + account.slice(account.length - 4, account.length)}</h1>
-                    <div className="border rounded-lg m-4 h-full w-full m-auto p-4 shadow">
+                    {
+                        !isConnected &&
+                        <button className=" w-full p-6 m-6 rounded rounded-2xl border border-blue-600 " onClick={(e) => handleConnect(e)}>Connect</button>
+                    }
+                    {
+                        isConnected && account &&
+                            <h1>You are connected with account: {account.slice(0, 6) + '...' + account.slice(account.length - 4, account.length)}</h1>
+                    }
+                    {
+                        isConnected && !account &&
+                            <h1>You are not connected</h1>
+                    }
+                    <div className="border rounded-lg h-full w-full m-auto p-4 shadow">
                         {
                             NFTs && NFTs.length > 0 &&
                             NFTs.map((nft) => {
                                 return (
-                                    <div key={nft.id} className='bg-white shadow rounded-lg flex flex-col'>
-                                        <img src={nft.meta.image} alt="nft" className="rounded-2xl p-2" />
+                                    <div key={nft.id} className='bg-white shadow rounded-lg flex flex-col '>
+                                        {
+                                            nft?.meta?.video ?
+                                                <video className='w-full h-full rounded-xl' poster={nft.meta.image} autoPlay muted playsInline loop controls>
+                                                    <source src={nft.meta.video} type="video/mp4" />
+                                                </video>
+                                            :
+                                            nft?.meta?.image &&
+                                                <img src={nft.meta.image} alt="nft" className="rounded-2xl p-2" /> 
+                                    }
                                         <hr className="mx-2 " />
                                         <div className="flex flex-row justify-around border-b mx-2">
                                             <h1 className="text-center">
@@ -66,6 +84,8 @@ const AuthZone = () => {
 
                                         </div>
                                         <p className="text-center text-sm font-light">{nft.meta.description}</p>
+
+
                                         {nft.balance > 0 &&
 
                                             <button
@@ -76,6 +96,7 @@ const AuthZone = () => {
 
                                         }
 
+
                                     </div>
                                 )
                             })
@@ -83,6 +104,7 @@ const AuthZone = () => {
 
                     </div>
                 </div>
+
             }
             {showModal.show &&
                 <div className="absolute h-full top-0 w-screen bg-blue-600 border flex flex-col items-center justify-center">
@@ -93,6 +115,7 @@ const AuthZone = () => {
                 </div>
             }
         </div >
+
     )
 }
 

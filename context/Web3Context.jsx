@@ -123,20 +123,46 @@ const utils = {
         }
     }
 
-}
+
+import config from '../contracts/NFTFactory'
+import utils, {networks} from '../utils/web3';
+
 
 export const Web3Context = createContext()
 
 export const Web3Provider = ({ children }) => {
     const [account, setAccount] = useState(null)
+    const [isConnected, setConnected] = useState(false)
     const [network, setNetwork] = useState(null)
     const [provider, setProvider] = useState(null)
     const [signer, setSigner] = useState(null)
     const [NFTFactory, setNFTFactory] = useState(null)
     const [NFTs, setNFTs] = useState(null)
 
-
+    const { address, abi, network: factNet } = config
     // NFTFactory UTILS
+
+    useEffect(() => {
+        let url = networks[factNet.chainId]?.rpcUrls[0]
+        console.log({url})
+        const provider = utils.getProviderWithoutMetaMask({
+            url
+        })        
+        let contract = utils.connectSmartContract({ abi, address, signer:provider })
+        setNFTFactory(contract)
+    }, [])
+
+    useEffect(function () {
+        async function fetchNFTs() {
+            if (NFTFactory && (!NFTs || NFTs.length === 0)) {
+                let nfts = await getNFTs()
+                console.log("AQUI",{ nfts, NFTFactory })
+                setNFTs(nfts)
+            }
+        }
+        fetchNFTs()
+    }, [NFTs, NFTFactory])
+
 
 
     const fetchMetadata = async ({ uri }) => {
@@ -171,6 +197,7 @@ export const Web3Provider = ({ children }) => {
 
     const connect = async () => {
         try {
+
             if (typeof window !== 'undefined') {
                 console.log("LLEGO")
                 const { contract, account, provider, network, signer } = await utils.connect()
@@ -180,25 +207,17 @@ export const Web3Provider = ({ children }) => {
                 setProvider(provider)
                 setNFTFactory(contract)
                 setSigner(signer)
+              setConnected(true)
             }
+
         } catch (error) {
             console.error("ERR:WEB3CTX:CONNECT:", error)
         }
     }
 
-    useEffect(function () {
-        async function fetchNFTs() {
-            if (NFTFactory && (!NFTs || NFTs.length === 0)) {
-                let nfts = await getNFTs()
-                console.log("AQUI", { nfts })
-                setNFTs(nfts)
-            }
-        }
-        fetchNFTs()
-    }, [NFTs, NFTFactory])
-
 
     const states = {
+        isConnected,
         account,
         network,
         provider,

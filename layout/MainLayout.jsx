@@ -5,7 +5,7 @@ const MainLayout = ({ children }) => {
     return (
         <div className="flex flex-1 flex-col items-center justify-center min-h-screen py-2">
             <Head>
-                <title>42Madrid Token By Universelle</title>
+                <title>42 Madrid Token Week Metaverse Pass by Universelle</title>
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <Header />
