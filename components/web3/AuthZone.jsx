@@ -66,14 +66,22 @@ const AuthZone = () => {
             {
                 account &&
                 <div className="flex flex-col items-center justify-center m-4">
-                    <h1>Account: {account.slice(0, 6) + '...' + account.slice(account.length - 4, account.length)}</h1>
-                    <div className="border rounded-lg m-4 h-full w-full m-auto p-4 shadow">
+                    <h1>You are connected with account: {account.slice(0, 6) + '...' + account.slice(account.length - 4, account.length)}</h1>
+                    <div className="border rounded-lg h-full w-full m-auto p-4 shadow">
                         {
                         NFTs && NFTs.length > 0 &&
                             NFTs.map((nft) => {
                                 return (
-                                    <div key={nft.id} className='bg-white shadow rounded-lg flex flex-col'>
-                                        <img src={nft.meta.image} alt="nft" className="rounded-2xl p-2" />
+                                    <div key={nft.id} className='bg-white shadow rounded-lg flex flex-col '>
+                                        {
+                                            nft?.meta?.video ?
+                                                <video className='w-full h-full rounded-xl' poster={nft.meta.image} autoPlay muted playsInline loop controls>
+                                                    <source src={nft.meta.video} type="video/mp4" />
+                                                </video>
+                                            :
+                                            nft?.meta?.image &&
+                                                <img src={nft.meta.image} alt="nft" className="rounded-2xl p-2" /> 
+                                    }
                                         <hr className="mx-2 " />
                                         <div className="flex flex-row justify-around border-b mx-2">
                                             <h1 className="text-center">
@@ -84,7 +92,7 @@ const AuthZone = () => {
                                                 {`#${nft.id}`}
                                             </h1>
                                         </div>
-                                        <p className="text-center text-sm font-light">{nft.description}</p>
+                                        <p className="text-center text-sm font-light">{nft.meta.description}</p>
                                     </div>
                                 )
                             })

@@ -5,7 +5,7 @@ const networks = {
     137: {
         chainName: "Polygon",
         chainId: "0x89",
-        rpcUrls: ["polygon-rpc.com"],
+        rpcUrls: ["https://polygon-rpc.com"],
         nativeCurrency: {
             name: "Matic",
             symbol: "Matic",
