@@ -5,11 +5,14 @@ import { toast } from 'react-toastify'
 
 import NFTFactory from '../contracts/NFTFactory.jsx';
 
+const { address, abi, network: factNet } = NFTFactory
+
+
 const networks = {
     137: {
         chainName: "Polygon",
         chainId: "0x89",
-        rpcUrls: ["polygon-rpc.com"],
+        rpcUrls: ["https://polygon-rpc.com"],
         nativeCurrency: {
             name: "Matic",
             symbol: "Matic",
@@ -42,6 +45,19 @@ const utils = {
         const provider = new ethers.providers.Web3Provider(detectedProvider ? detectedProvider : window.ethereum)
         console.log('UTILS:WEB3:PROVIDER', provider)
         return provider
+    },
+
+    getProviderWithoutMetaMask: function ({ url }) {
+        const provider = new ethers.providers.JsonRpcProvider(url)
+        console.log('UTILS:WEB3:PROVIDER', provider)
+        return provider
+    },
+
+    connectWithoutMetamask: function () {
+        const provider = this.getProviderWithoutMetaMask({ url: networks[factNet.chainId].rpcUrls[0] })
+        const contract = this.connectSmartContract({ abi, address, signer: provider })
+
+        return { provider, contract }
     },
 
     getSigner: async function ({ provider }) {
@@ -92,17 +108,17 @@ const utils = {
 
     connect: async function () {
         try {
-            const { address, abi, network: factNet } = NFTFactory
             const detectedProvider = await detectEthereumProvider();
             if (detectedProvider) {
                 await this.requestAccount()
                 const provider = this.getProvider({ detectedProvider })
-                const network = await this.getNetwork({ provider })
+                let network = await this.getNetwork({ provider })
                 if (network?.chainId !== factNet?.chainId) {
                     toast.warning('Please switch to the correct network')
                     let response = await this.switchNetwork({ network: networks[factNet.chainId] })
                     console.log('UTILS:WEB3:SWITCHNETWORK:', response)
                 }
+                network = await this.getNetwork({ provider })
                 if (network?.chainId === factNet?.chainId) {
                     const signer = await this.getSigner({ provider })
                     const account = await this.getAccount({ provider })
@@ -112,7 +128,10 @@ const utils = {
                 }
             } else {
                 toast.error('Please install MetaMask.')
-                throw new Error('Please install MetaMask')
+                const provider = this.getProviderWithoutMetaMask({ url: networks[factNet.chainId].rpcUrls[0] })
+                const contract = this.connectSmartContract({ abi, address, signer: provider })
+                let network = await this.getNetwork({ provider })
+                return { provider, contract, network, account: null, signer: null }
             }
         } catch (error) {
             toast.error('Error connecting', error.message)
@@ -131,9 +150,33 @@ export const Web3Provider = ({ children }) => {
     const [signer, setSigner] = useState(null)
     const [NFTFactory, setNFTFactory] = useState(null)
     const [NFTs, setNFTs] = useState(null)
+    const [isConnected, setIsConnected] = useState(false)
 
 
-    // NFTFactory UTILS
+    useEffect(async function () {
+        async function fetchNFTs() {
+            if (NFTFactory && !NFTs) {
+                let nfts = await getNFTs()
+                setNFTs(nfts)
+            }
+            if (NFTs?.filter(n => n.balance !== 0).length === 0 && account) {
+                let nfts = await getNFTs()
+                setNFTs(nfts)
+            }
+        }
+        await fetchNFTs()
+    }, [NFTs, NFTFactory, account])
+
+    useEffect(() => {
+        const { contract, provider } = utils.connectWithoutMetamask()
+        setNFTFactory(contract)
+        setProvider(provider)
+        setIsConnected(true)
+    }, [])
+
+
+
+
 
     const getNFTs = async () => {
         try {
@@ -145,8 +188,8 @@ export const Web3Provider = ({ children }) => {
                 let customUri = uri.replace('{id}', ethers.BigNumber.from(i).toHexString().replace('0x', '').padStart(64, '0'))
                 let res = await fetch(customUri)
                 let meta = await res.json()
-                let balance = await NFTFactory.balanceOf(account, id)
-                nfts.push({ meta, id, balance: balance.toNumber() })
+                let balance = account ? await NFTFactory.balanceOf(account, id) : 0
+                nfts.push({ meta, id, balance })
             }
             return nfts
         } catch (error) {
@@ -159,6 +202,7 @@ export const Web3Provider = ({ children }) => {
     const connect = async () => {
         try {
             if (typeof window !== 'undefined') {
+
                 console.log("LLEGO")
                 const { contract, account, provider, network, signer } = await utils.connect()
                 console.log({ contract, account, provider, network, signer })
@@ -167,22 +211,13 @@ export const Web3Provider = ({ children }) => {
                 setProvider(provider)
                 setNFTFactory(contract)
                 setSigner(signer)
+
             }
         } catch (error) {
             toast.error('Error while connecting.')
             console.error("ERR:WEB3CTX:CONNECT:", error)
         }
     }
-
-    useEffect(function () {
-        async function fetchNFTs() {
-            if (NFTFactory && (!NFTs || NFTs.length === 0)) {
-                let nfts = await getNFTs()
-                setNFTs(nfts)
-            }
-        }
-        fetchNFTs()
-    }, [NFTs, NFTFactory])
 
 
     const states = {
@@ -192,6 +227,7 @@ export const Web3Provider = ({ children }) => {
         signer,
         NFTFactory,
         NFTs,
+        isConnected
     }
 
     const methods = {
