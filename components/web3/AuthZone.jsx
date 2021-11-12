@@ -59,7 +59,15 @@ const AuthZone = () => {
                         NFTs.map((nft) => {
                             return (
                                 <div key={nft.id} className='bg-white shadow rounded-lg flex flex-col'>
-                                    <img src={nft.meta.image} alt="nft" className="rounded-2xl p-2" />
+                                    {
+                                        nft?.meta?.video ?
+                                            <video className='w-full h-full rounded-xl' poster={nft.meta.image} autoPlay muted playsInline loop controls>
+                                                <source src={nft.meta.video} type="video/mp4" />
+                                            </video>
+                                            :
+                                            nft?.meta?.image &&
+                                            <img src={nft.meta.image} alt="nft" className="rounded-2xl p-2" />
+                                    }
                                     <hr className="mx-2 " />
                                     <div className="flex flex-row justify-around border-b mx-2">
                                         <h1 className="text-center">
@@ -90,14 +98,19 @@ const AuthZone = () => {
 
                 </div>
             </div>
-
             {
                 showModal.show &&
-                <div className="absolute h-full top-0 w-screen bg-blue-600 border flex flex-col items-center justify-center">
+                <div className="absolute left-0 h-full top-0 w-full bg-gray-400 border flex flex-col items-center justify-center">
                     <button
                         className="absolute top-0 w-full border p-1"
                         onClick={(e) => { e.preventDefault(); setShowModal(false) }}>close modal</button>
-                    <h1>{showModal.nft.id}</h1>
+                    <h1>Recursos y enlaces de Interes</h1>
+                    <p>Enlace al repo de git de la web3.0:
+                        <a target="_blank" href='https://github.com/imaginft/42MAdridTokenWeekDapp'> AQUI</a>
+                    </p>
+                    <p>Enlace al repo de git de los smart contracts:
+                        <a target="_blank" href='https://github.com/ImagiNFT/42Mad-token-week-contracts'> AQUI</a>
+                    </p>
                 </div>
             }
         </div >
