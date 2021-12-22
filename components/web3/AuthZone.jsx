@@ -68,7 +68,7 @@ const AuthZone = () => {
                                             minHeight: '100vh'
                                         }}
                                         src={nft.meta.model} alt={nft.meta.name}
-                                        skybox-image='/assets/cielo.jpg'
+                                        skybox-image='/assets/black.png'
                                         loading="eager" reveal="auto"
                                         poster={nft.meta.image}
                                         autoplay
