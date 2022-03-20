@@ -60,31 +60,31 @@ const AuthZone = () => {
                         NFTs.map((nft) => {
                             return (
                                 <div key={nft.id} className='bg-white shadow rounded-lg flex flex-col'>
-                                    
-                                    <div style={{minHeight: 350 }}>
+
+                                    <div style={{ minHeight: 350 }}>
                                     <model-viewer
                                         style={{
-                                            width:'auto',
+                                            width: 'auto',
                                             minHeight: '100vh'
                                         }}
-                                        src={nft.meta.model} alt={nft.meta.name}
-                                        skybox-image='/assets/black.png'
-                                        loading="eager" reveal="auto"
+                                        src={nft.meta.model}
+                                        alt={nft.meta.name}
+                                        skybox-image={nft.meta.bgImg}
+                                        environment-image={nft.meta.bgImg}
+                                        loading="eager"
+                                        reveal="auto"
+                                        quick-look
+                                        auto-rotate="true"
+                                        camera-controls="true"
+                                        camera-orbit="812.6deg 78.61deg auto"
+                                        exposure="0.68"
                                         poster={nft.meta.image}
                                         autoplay
-                                        ar ar-modes="webxr scene-viewer quick-look"
-                                        xr-enviroment
-                                        auto-rotate camera-controls></model-viewer>
+                                        ar
+                                        ar-modes={"webxr scene-viewer quick-look"}
+                                        xr-enviroment>
+                                    </model-viewer>
                                     </div>
-                                    {/*
-                                        nft?.meta?.video ?
-                                            <video className='w-full h-full rounded-xl' poster={nft.meta.image} autoPlay muted playsInline loop controls>
-                                                <source src={nft.meta.video} type="video/mp4" />
-                                            </video>
-                                            :
-                                            nft?.meta?.image &&
-                                            <img src={nft.meta.image} alt="nft" className="rounded-2xl p-2" />
-                                    */}
                                     <hr className="mx-2 " />
                                     <div className="flex flex-row justify-around border-b mx-2">
                                         <h1 className="text-center">
@@ -117,7 +117,7 @@ const AuthZone = () => {
                     <button
                         className="absolute top-0 w-full border p-1"
                         onClick={(e) => { e.preventDefault(); setShowModal(false) }}>close modal</button>
-                    
+
                     <h1>Recursos y enlaces de Interes</h1>
                     <p>Enlace al repo de git de la web3.0:
                         <a target="_blank" href='https://github.com/imaginft/42MAdridTokenWeekDapp'> AQUI</a>
